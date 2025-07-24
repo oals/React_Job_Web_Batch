@@ -14,34 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-
 public class JobBatchController {
 
     private final JobLauncher jobLauncher;
-    private final Job exampleJob;
+    private final Job selectJobInfo;
 
-    public JobBatchController(JobLauncher jobLauncher, @Qualifier("exampleJob") Job exampleJob) {
+    public JobBatchController(JobLauncher jobLauncher, @Qualifier("selectJobInfo") Job selectJobInfo) {
         this.jobLauncher = jobLauncher;
-        this.exampleJob = exampleJob;
+        this.selectJobInfo = selectJobInfo;
     }
 
-    @GetMapping("/run")
-    public String runBatch() throws Exception {
-        JobParameters params = new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis())
-                .toJobParameters();
-        jobLauncher.run(exampleJob, params);
-        return "배치 실행됨";
-    }
 
-    @GetMapping("/run2")
-    public String runBatc2h() {
+    @GetMapping("/batch/job/run")
+    public String jobStart() {
         try {
             JobParameters params = new JobParametersBuilder()
                     .addString("runTime", LocalDateTime.now().toString()) // JobInstance 식별용
                     .toJobParameters();
 
-            JobExecution execution = jobLauncher.run(exampleJob, params);
+            JobExecution execution = jobLauncher.run(selectJobInfo, params);
             return "Batch started: " + execution.getStatus();
         } catch (Exception e) {
             e.printStackTrace();

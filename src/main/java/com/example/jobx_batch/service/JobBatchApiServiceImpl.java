@@ -1,16 +1,49 @@
 package com.example.jobx_batch.service;
 
-import com.example.jobx_batch.dto.JobInfoDto;
+import com.example.jobx_batch.dao.JobDao;
+import com.example.jobx_batch.dto.JobDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JobBatchApiServiceImpl implements JobBatchApiService{
 
-    @Override
-    public List<JobInfoDto> fetchJobListFromApi() {
-        return List.of(new JobInfoDto("백엔드 개발자test", "test", 4500, 7000, 10000));
+    private final JobDao jobDao;
 
+    @Override
+    public List<String> selectJobCdList() {
+        return jobDao.selectJobCdList();
+    }
+
+    @Override
+    public void insertJob(JobDto jobDto) {
+        jobDao.insertJob(jobDto);
+
+        if (jobDto.getRelCertList() != null && !jobDto.getRelCertList().isEmpty()) {
+            jobDao.insertCerts(jobDto.getRelCertList());
+
+            for (JobDto.RelCert cert : jobDto.getRelCertList()) {
+                jobDao.insertJobCerts(jobDto.getJobCd(), cert.getCertNm());
+            }
+        }
+
+        if (jobDto.getRelMajorList() != null && !jobDto.getRelMajorList().isEmpty()) {
+            jobDao.insertMajors(jobDto.getRelMajorList());
+
+            for (JobDto.RelMajor major : jobDto.getRelMajorList()) {
+                jobDao.insertJobMajors(jobDto.getJobCd(), major.getMajorCd(), major.getMajorNm());
+            }
+        }
+
+        if (jobDto.getRelJobList() != null && !jobDto.getRelJobList().isEmpty()) {
+            jobDao.insertRelatedJobs(jobDto.getRelJobList());
+
+            for (JobDto.RelJob relJob : jobDto.getRelJobList()) {
+                jobDao.insertJobRelMap(jobDto.getJobCd(), relJob.getJobCd());
+            }
+        }
     }
 }

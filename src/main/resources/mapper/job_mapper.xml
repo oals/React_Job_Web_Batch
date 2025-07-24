@@ -5,9 +5,75 @@
 
 <mapper namespace="com.example.jobx_batch.dao.JobDao">
 
-    <insert id="insertJob" parameterType="com.example.jobx_batch.dto.JobInfoDto">
-        INSERT INTO jobs (job_id, name, description)
-        VALUES (#{jobId}, #{name}, #{description})
+    <select id="selectJobCdList" resultType="String">
+        SELECT
+            j.job_cd
+        FROM
+            jobs j
+    </select>
+
+    <insert id="insertJob" parameterType="com.example.jobx_batch.dto.JobDto">
+        INSERT INTO jobs (
+            job_cd, job_lrcl_nm, job_mdcl_nm, job_smcl_nm,
+            job_sum, way, sal, job_satis, job_prospect,
+            job_status, job_abil, knowldg, job_env,
+            job_chr, job_intrst, job_vals, job_actv_imprtncs, job_actv_lvls
+        ) VALUES (
+            #{jobCd}, #{jobLrclNm}, #{jobMdclNm}, #{jobSmclNm},
+            #{jobSum}, #{way}, #{sal}, #{jobSatis}, #{jobProspect},
+            #{jobStatus}, #{jobAbil}, #{knowldg}, #{jobEnv},
+            #{jobChr}, #{jobIntrst}, #{jobVals}, #{jobActvImprtncs}, #{jobActvLvls}
+        )
+    </insert>
+
+    <insert id="insertCerts" parameterType="java.util.List">
+        INSERT IGNORE INTO cert (cert_nm)
+        VALUES
+        <foreach collection="relCertList" item="item" separator=",">
+            (#{item.certNm})
+        </foreach>
+    </insert>
+
+    <insert id="insertJobCerts" parameterType="map">
+        INSERT INTO job_cert_map (job_cd, cert_id)
+            SELECT
+                #{jobCd}, c.cert_id
+            FROM
+                cert c
+            WHERE
+                c.cert_nm = #{certNm}
+    </insert>
+
+    <insert id="insertMajors" parameterType="java.util.List">
+        INSERT IGNORE INTO major (major_cd, major_nm)
+        VALUES
+        <foreach collection="relMajorList" item="item" separator=",">
+            (#{item.majorCd}, #{item.majorNm})
+        </foreach>
+    </insert>
+
+    <insert id="insertJobMajors" parameterType="map">
+        INSERT INTO job_major_map (job_cd, major_id)
+            SELECT
+                #{jobCd}, m.major_id
+            FROM
+                major m
+            WHERE
+                m.major_cd = #{majorCd} AND m.major_nm = #{majorNm}
+    </insert>
+
+    <insert id="insertRelatedJobs" parameterType="java.util.List">
+        INSERT IGNORE INTO job (job_cd, job_nm)
+        VALUES
+        <foreach collection="relJobList" item="item" separator=",">
+            (#{item.jobCd}, #{item.jobNm})
+        </foreach>
+    </insert>
+
+    <insert id="insertJobRelMap" parameterType="map">
+        INSERT INTO job_rel_map (job_cd, rel_job_cd)
+        VALUES (#{jobCd}, #{relJobCd})
+        ON DUPLICATE KEY UPDATE rel_job_cd = rel_job_cd
     </insert>
 
 </mapper>
