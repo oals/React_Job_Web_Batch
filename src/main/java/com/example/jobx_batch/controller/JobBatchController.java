@@ -18,10 +18,12 @@ public class JobBatchController {
 
     private final JobLauncher jobLauncher;
     private final Job selectJobInfo;
+    private final Job selectJobNews;
 
-    public JobBatchController(JobLauncher jobLauncher, @Qualifier("selectJobInfo") Job selectJobInfo) {
+    public JobBatchController(JobLauncher jobLauncher, @Qualifier("selectJobInfo") Job selectJobInfo, @Qualifier("selectJobNews") Job selectJobNews) {
         this.jobLauncher = jobLauncher;
         this.selectJobInfo = selectJobInfo;
+        this.selectJobNews = selectJobNews;
     }
 
 
@@ -39,5 +41,26 @@ public class JobBatchController {
             return "Batch failed: " + e.getMessage();
         }
     }
+
+    @GetMapping("/batch/news/run")
+    public String jobNewsStart() {
+        try {
+            JobParameters params = new JobParametersBuilder()
+                    .addString("runTime", LocalDateTime.now().toString()) // JobInstance 식별용
+                    .toJobParameters();
+
+            JobExecution execution = jobLauncher.run(selectJobNews, params);
+            return "Batch started: " + execution.getStatus();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Batch failed: " + e.getMessage();
+        }
+    }
+
+
+
+
+
+
 
 }

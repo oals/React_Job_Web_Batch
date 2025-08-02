@@ -1,10 +1,15 @@
 package com.example.jobx_batch.service;
 
 import com.example.jobx_batch.dao.JobDao;
+import com.example.jobx_batch.dao.NewsDao;
 import com.example.jobx_batch.dto.JobDto;
+import com.example.jobx_batch.dto.NewsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -12,6 +17,7 @@ import java.util.List;
 public class JobBatchApiServiceImpl implements JobBatchApiService{
 
     private final JobDao jobDao;
+    private final NewsDao newsDao;
 
     @Override
     public List<String> selectJobCdList() {
@@ -46,4 +52,18 @@ public class JobBatchApiServiceImpl implements JobBatchApiService{
             }
         }
     }
+
+    @Override
+    public void insertNews(NewsDto newsDto) {
+
+        newsDao.insertNewsSource(newsDto.getSource());
+
+        String sourceId = newsDao.selectNewsSource(newsDto.getSource());
+
+        newsDto.setSourceId(sourceId);
+
+        newsDao.insertNews(newsDto);
+
+    }
+
 }
