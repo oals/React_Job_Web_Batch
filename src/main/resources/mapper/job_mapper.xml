@@ -13,7 +13,7 @@
     </select>
 
     <insert id="insertJob" parameterType="com.example.jobx_batch.dto.JobDto">
-        INSERT INTO jobs (
+        INSERT IGNORE INTO jobs (
             job_cd, job_lrcl_nm, job_mdcl_nm, job_smcl_nm,
             job_sum, way, sal, job_satis, job_prospect,
             job_status, job_abil, knowldg, job_env,
@@ -35,7 +35,7 @@
     </insert>
 
     <insert id="insertJobCerts" parameterType="map">
-        INSERT INTO job_cert_map (job_cd, cert_id)
+        INSERT IGNORE INTO job_cert_map (job_cd, cert_id)
             SELECT
                 #{jobCd}, c.cert_id
             FROM
@@ -53,7 +53,7 @@
     </insert>
 
     <insert id="insertJobMajors" parameterType="map">
-        INSERT INTO job_major_map (job_cd, major_id)
+        INSERT IGNORE INTO job_major_map (job_cd, major_id)
             SELECT
                 #{jobCd}, m.major_id
             FROM
@@ -71,7 +71,7 @@
     </insert>
 
     <insert id="insertJobRelMap" parameterType="map">
-        INSERT INTO job_rel_map (job_cd, rel_job_cd)
+        INSERT IGNORE INTO job_rel_map (job_cd, rel_job_cd)
         VALUES (#{jobCd}, #{relJobCd})
         ON DUPLICATE KEY UPDATE rel_job_cd = rel_job_cd
     </insert>

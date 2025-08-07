@@ -38,6 +38,7 @@ public class JobCodeReader implements ItemReader<String> {
         if (jobCodeIterator.hasNext()) {
             return jobCodeIterator.next();
         } else {
+            jobCodeIterator = null;
             return null;
         }
     }

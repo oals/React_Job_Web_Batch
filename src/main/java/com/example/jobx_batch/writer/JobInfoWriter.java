@@ -34,6 +34,7 @@ public class JobInfoWriter implements ItemWriter<String> {
             if (responseXml != null) {
                 XmlParserUtils xmlParserUtils = new XmlParserUtils();
                 JobDto jobDto = xmlParserUtils.parse(responseXml);
+                System.out.println("Write Job: " + jobDto.getJobMdclNm());
                 jobBatchApiService.insertJob(jobDto);
             }
         }

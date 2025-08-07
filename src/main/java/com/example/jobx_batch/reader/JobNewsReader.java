@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemReader;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +25,19 @@ public class JobNewsReader implements ItemReader<NewsDto> {
 
     @Override
     public NewsDto read() throws Exception {
+
         if (jobNewsIterator == null) {
 
-            String query = "취업";
-            String apiUrl = "https://newsapi.org/v2/everything?q=" + query + "&language=ko&apiKey=" + authKey;
+            String query = "취업 OR 직업 OR 채용 OR 국비학원 OR 국비교육 OR 부트캠프";
+
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            String dateStr = yesterday.format(DateTimeFormatter.ISO_DATE); // "yyyy-MM-dd"
+
+            String apiUrl = "https://newsapi.org/v2/everything?q=" + query +
+                    "&language=ko" +
+                    "&from=" + dateStr +
+                    "&to=" + dateStr +
+                    "&apiKey=" + authKey;
 
             System.out.println(apiUrl);
             String responseJson = employmentApiClient.callEmploymentInfo(apiUrl);
@@ -57,6 +66,7 @@ public class JobNewsReader implements ItemReader<NewsDto> {
         if (jobNewsIterator.hasNext()) {
             return jobNewsIterator.next();
         } else {
+            jobNewsIterator = null;
             return null;
         }
 
